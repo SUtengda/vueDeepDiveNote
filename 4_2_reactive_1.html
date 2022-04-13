@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+</body>
+  <script>
+    let activeEffect;
+
+    class Dep {
+      subscribers = new Set()
+
+      depend() {
+        if (activeEffect) {
+          this.subscribers.add(activeEffect)
+        }
+      }
+
+      notify() {
+        this.subscribers.forEach(effect => {
+          effect()
+        })
+      }
+    }
+
+    function watchEffect(effect) {
+      activeEffect = effect
+      effect()
+      activeEffect = null
+    }
+
+    function reactive(raw) {
+      Object.keys(raw).forEach(key => {
+        const dep = new Dep()
+        let value = raw[key]
+
+        Object.defineProperty(raw, key, {
+          get() {
+            dep.depend()
+            return value
+          },
+
+          set(newValue) {
+            value = newValue;
+            dep.notify()
+          }
+
+        })
+      })
+      return raw;
+    }
+
+    const state = reactive({
+      count: 0,
+      count2: 1
+    })
+
+    watchEffect(() => {
+      console.log(state.count);
+      // console.log(state.count2);
+      console.log('msg is :',state.msg)
+
+    })
+
+    // state.count++
+
+  </script>
+
+</html>

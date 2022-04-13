@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .red {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+</body>
+
+<script>
+  function h(tag, props, children) {
+    return {
+      tag,
+      props,
+      children
+    }
+  }
+  // assuming vnode is always an element node
+  function mount(vnode, container) {
+    // Step1: create a real element
+    const el = document.createElement(vnode.tag)
+
+    // Step2: patch props to real dom
+    if (vnode.props) {
+      for (const key in vnode.props) {
+        const value = vnode.props[key]
+        // assuming that all props are attribute, no event listener or others 
+        // for example id class etc. 
+        el.setAttribute(key, value)
+      }
+    }
+
+    // Step3: children
+    // assuming that children is an array of virtual node or a string
+    if (vnode.children) {
+      if (typeof vnode.children === 'string') {
+        el.textContent = vnode.children
+      } else {
+        vnode.children.forEach(child => {
+          mount(child, el)
+        });
+      }
+    }
+
+    container.appendChild(el)
+  }
+
+  const vdom = h('div', { class: 'red' }, [
+    h('span', null, 'hello')
+  ])
+
+  mount(vdom, document.getElementById('app'))
+</script>
+
+</html>
